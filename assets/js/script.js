@@ -279,6 +279,50 @@ var saveTasks = function() {
   localStorage.setItem("tasks", JSON.stringify(tasks));
 }
 
+var loadTasks = function() {
+  // get tasks from localStorage
+  var savedTasks = localStorage.getItem("tasks"); 
+  console.log(savedTasks);
+
+  if (!savedTasks) {
+    return false;
+  }
+  
+  // convert tasks from string back into array objects
+  savedTasks = JSON.parse(savedTasks);
+  
+  // iterate through a task array and create task element on the page from it
+  for (var i = 0; i < savedTasks.length; i++) {
+    taskIdCounter = savedTasks[i].id;
+    var listItemEl = document.createElement("li");
+    listItemEl.className = "task-item";
+    listItemEl.setAttribute("data-task-id", taskIdCounter);
+    listItemEl.setAttribute("draggable", "true");
+
+    var taskInfoEl = document.createElement("div");
+    taskInfoEl.className = "task-info";
+    taskInfoEl.innerHTML = "<h3 class='task-name'>" + savedTasks[i].name + "</h3><span class='task-type'>" + savedTasks[i].type + "</span>";
+    listItemEl.appendChild(taskInfoEl);
+
+    var taskActionsEl = createTaskActions(taskIdCounter);
+    listItemEl.appendChild(taskActionsEl);
+
+    switch (savedTasks[i].status) {
+      case "to-do":
+        listItemEl.querySelector("select[name='status-change']").selectedIndex = 0;
+        tasksToDoEl.append(listItemEl);
+      case "in progres":
+        listItemEl.querySelector("select[name='status-change']").selectedIndex = 1;
+        tasksInProgressEl.append(listItemEl);
+      case "completed":
+        listItemEl.querySelector("select[name='status-change']").selectedIndex = 2;
+        tasksCompletedEl.append(listItemEl);
+      }
+    taskIdCounter++;
+    console.log(listItemEl); 
+  }
+}
+
 // Create a new task
 formEl.addEventListener("submit", taskFormHandler);
 
@@ -293,3 +337,5 @@ pageContentEl.addEventListener("dragstart", dragTaskHandler);
 pageContentEl.addEventListener("dragover", dropZoneDragHandler);
 pageContentEl.addEventListener("dragleave", dragLeaveHandler);
 pageContentEl.addEventListener("drop", dropTaskHandler);
+
+loadTasks();
